@@ -216,12 +216,12 @@ function getRandomScore(maxScore) {
 
 // Given a student ID, return the student's object
 function getStudentById(studentId) {
-  
+  return classroom.students.find( student => student.id === studentId)
 }
 
 // Given an assignment ID, return the assignment's object
 function getAssignmentById(assignmentId) {
-  
+  return classroom.assignments.find( assignment => assignment.id === assignmentId)
 }
 
 // Add together the pointsPossible on every assignment and return that number
