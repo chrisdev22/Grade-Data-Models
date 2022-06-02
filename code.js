@@ -3,6 +3,9 @@ const assignmentTwoId = shortid.generate();
 const assignmentThreeId = shortid.generate();
 const assignmentFourId = shortid.generate();
 
+// All credits go to Jon Taylor (Facilitator) for creating the walkthrough.
+// Thank you!
+
 let classroom = {
   name: "Intro to JavaScript",
   teacher: {
@@ -226,31 +229,61 @@ function getAssignmentById(assignmentId) {
 
 // Add together the pointsPossible on every assignment and return that number
 function getTotalPossiblePoints() {
-  
+  // Refactored version by Jon Taylor (Facilitator)
+  return classroom.assignments.reduce( (sum, assignment) => {
+    return sum + assignment.pointsPossible
+  }, 0 )
+  // let totalPoints = 0
+  // for (let assignment of classroom.assignments) {
+  //   totalPoints += assignment.pointsPossible
+  // }
+  // return totalPoints
 }
 
 // Given a student id, add together their score for every assignment
 function calculateStudentTotalPoints(studentId) {
-  
+  // Jon Taylor's Reduced Method
+  let student = getStudentById(studentId)
+  return student.assignmentGrades.reduce( (sum, assignment) => {
+    return sum + assignment.score
+  }, 0 )
+  // let student = getStudentById(studentId)
+  // let totalScore = 0
+  // for (let assignment of student.assignmentGrades) {
+  //   totalScore += assignment.score
+  // }
+  // return totalScore
 }
 
 // Given a student id, calculate their overall grade percentage
 // Hint: get their total points, and the total possible points, and use those to getGradePercentage
 function calculateStudentOverallGradePercentage(studentId) {
-  
+  let totalPoints = calculateStudentTotalPoints(studentId)
+  let totalPossible = getTotalPossiblePoints()
+  return getGradePercentage(totalPoints, totalPossible)
 }
 
 // Given a student id, return their letter grade
 // Hint: This can call the previous function and pass it to getLetter Grade
 function getLetterGradeForStudent(studentId) {
-  
+  let percentage = calculateStudentOverallGradePercentage(studentId)
+  return getLetterGrade(percentage)
 }
 
 // calculate the average overall grade of all of the students in the classroom
 // Get the grade percentage of each student and add them all together
 // Divide that by the total number of students
 function calculateAvgGradePercentageInClassroom() {
-  
+  // Jon Taylor's Reduced Pattern
+  let totalGradePercent = classroom.students.reduce( (sum, student) => {
+    return sum + calculateStudentOverallGradePercentage(student.id)
+  }, 0 )
+
+  return totalGradePercent / classroom.students.length
+  // let totalGradePercent = 0
+  // for (let student of classroom.students) {
+  //   totalGradePercent += calculateStudentOverallGradePercentage(student.id)
+  // }
 }
 
 // -----------------------------------------------------------------------------------
@@ -263,7 +296,9 @@ function renderAssignmentsGrades(assignmentGrades) {
   let html = "<ul>";
 
   for (let assignmentGrade of assignmentGrades) {
-    html += `<li>**AssignmentName** - **Score**/**PossiblePoints**</li>`
+    let {assignmentId, score} = assignmentGrade
+    let {name, pointsPossible} = getAssignmentById(assignmentId)
+    html += `<li>${name} - ${score}/${pointsPossible}</li>`
   }
   
   html += "</ul>"
@@ -278,11 +313,18 @@ function renderStudents(students) {
 
   for (let student of students) {
     // Hint: Only render the <span class="warning"></span> if the student's overall grade isFailingGrade().  A ternary would be great here...
+    
+    let letterGrade = getLetterGradeForStudent(student.id)
+    let gradePercentage = calculateStudentOverallGradePercentage(student.id)
+
+    // Writing down my first ternary with a glorified if statement.
+    // I'm in awe as of how this is done with a <span></span> in quotes.
+    // This is extremely useful to learn.
 
     html += `
       <li>
-        <div><strong>${student.firstName} **LastName**</strong></div>
-        <div>Grade: **LetterGrade** - **GradePercentage** <span class="warning"></span></div>
+        <div><strong>${student.firstName} ${student.lastName}</strong></div>
+        <div>Grade: ${letterGrade} - ${gradePercentage} ${ isFailingGrade(gradePercentage) ? '<span class="warning"></span>' : '' }</div>
         <div>Assignment Scores:</div>
         ${renderAssignmentsGrades(student.assignmentGrades)}
       </li>
@@ -301,9 +343,9 @@ function renderGradebook() {
   let html = `
     <header>
       <h2>Gradebook</h2>
-      <h4>**ClassroomName** with **TeacherName**</h4>
-      <h4>Number of Assignments: **NumberOfAssignments**</h4>
-      <h4>Average Grade Percentage: **AverageGradePercentInClass**</h4>
+      <h4>${classroom.name} with ${classroom.teacher.name}</h4>
+      <h4>Number of Assignments: ${classroom.assignments.length}</h4>
+      <h4>Average Grade Percentage: ${calculateAvgGradePercentageInClassroom()}</h4>
     </header>
     ${renderStudents(classroom.students)}
   `;
@@ -323,7 +365,7 @@ function addStudent(firstName, lastName) {
     assignmentGrades: []
   }
 
-  // Give the student a random score for each assighnment
+  // Give the student a random score for each assignment
   for (let assignment of classroom.assignments) {
     student.assignmentGrades.push({
       assignmentId: assignment.id,
