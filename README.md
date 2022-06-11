@@ -1,5 +1,3 @@
-# Kenzie Academy JavaScript Assignment
+Grade Data Models Project
 
-Complete your work inside of `code.js`
-
-Follow the instructions provided on my.kenzie.academy for this assignment.
+This Data Models Project helped me understand the use of ternary operators in a glorified if statement. It positively took my perspective of refactoring lines of code to another level. On the other hand, I had to implement the reduce() method which works by passing in the return value from the calculation on the preceding element. I figured out on my own how to get the average point grade percentage for the students which only required the use of strings since most of them were already either working as an array or as part of the functions that I developed before. It was awesome! 
